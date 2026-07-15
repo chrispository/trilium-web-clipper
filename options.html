@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"><title>Trilium Clipper settings</title></head>
+  <body class="options">
+    <main>
+      <header><span class="mark">T</span><div><h1>Trilium Clipper</h1><p>Connect directly to your self-hosted Trilium server.</p></div></header>
+      <form id="settings-form">
+        <label>Trilium server address<input id="server-url" type="url" required placeholder="https://trilium.example.com"></label>
+        <label>ETAPI token<input id="token" type="password" required autocomplete="off" placeholder="Paste an ETAPI token"></label>
+        <label>Clip destination<input id="destination-path" type="text" required placeholder="Clippings" autocomplete="off"></label>
+        <p class="explanation">Use a slash-separated note path. For example, <code>Clippings</code> creates a top-level folder, while <code>ideaverse/Clippings</code> creates or reuses that nested path. The date folder is added automatically.</p>
+        <label class="checkbox-label"><input id="organize-by-date" type="checkbox"> Save clips under <code>Clippings/YYYYMMDD</code></label>
+        <p class="explanation">When enabled, the extension creates the destination path and a date book such as <code>20260714</code> automatically. Turn this off to use Trilium’s normal clipper inbox behavior.</p>
+        <p class="explanation">In Trilium, open <em>Options → ETAPI</em>, create a token, then paste it here. The token stays in this browser’s local extension storage and is sent only to this configured server.</p>
+        <div class="form-actions"><button type="submit" class="primary">Save settings</button><button id="test" type="button">Test connection</button></div>
+        <p id="status" class="status" aria-live="polite"></p>
+      </form>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

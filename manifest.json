@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Homelab Trilium Clipper",
+  "version": "0.2.1",
+  "description": "Clip selections, readable pages, and quick notes to a self-hosted Trilium Notes server.",
+  "permissions": ["activeTab", "contextMenus", "scripting", "storage", "tabs"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Clip to Trilium",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/trilium-16.png",
+      "32": "icons/trilium-32.png",
+      "48": "icons/trilium-48.png",
+      "128": "icons/trilium-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/trilium-16.png",
+    "32": "icons/trilium-32.png",
+    "48": "icons/trilium-48.png",
+    "128": "icons/trilium-128.png"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "clip-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Clip the current selection to Trilium"
+    }
+  }
+}

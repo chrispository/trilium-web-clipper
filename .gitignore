@@ -1,0 +1,23 @@
+# Dependencies and generated build output
+node_modules/
+dist/
+build/
+.output/
+coverage/
+
+# Packaged browser-extension artifacts
+*.zip
+*.crx
+*.xpi
+
+# Local tooling and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
