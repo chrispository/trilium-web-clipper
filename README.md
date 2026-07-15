@@ -7,7 +7,7 @@ A small, web clipping browser extension optimized for self-hosted Trilium Notes 
 ## Install
 
 1. In your Trilium instance, create an ETAPI token: **Options → ETAPI**.
-2. Visit `chrome://extensions`, enable **Developer mode**, select **Load unpacked**, and choose the cloned directory.
+2. Visit `chrome://extensions`, enable **Developer mode**, select **Load unpacked**, and choose the unzipped directory.
 3. Open the extension’s (right-click)  **Options**, enter your Trilium server address (including port if necessary), paste the token, and select **Test connection**.
 4. Clip a selection or page from the toolbar popup, or use the page’s right-click menu.
 
