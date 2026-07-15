@@ -1,6 +1,6 @@
 # Trilium Web Clipper - Unofficial
 
-A small, dependency-free, web clipping browser extension optimized for self-hosted Trilium Notes. The layout was cloned from the popular Obsidian Web Clipper. For Chromium based browsers.
+A small, web clipping browser extension optimized for self-hosted Trilium Notes instances. The layout was cloned from the popular Obsidian Web Clipper, and also uses Defuddle just like Obsidian Web Clipper. For Chromium based browsers. Markdown for
 
 ## Install
 
@@ -18,6 +18,7 @@ The server address and token are stored locally in the browser's extension stora
 ## Scope
 
 - Selection, page, link, and quick-text clips.
+- Popup tags are saved as searchable Trilium label attributes; enter multiple tags separated by commas.
 - Keyboard shortcut: `Ctrl+Shift+Y` / `Command+Shift+Y`.
 - Page clips retain basic HTML and convert relative links/images to absolute URLs. When using the built-in clipper inbox mode, Trilium also handles its normal image processing.
 - By default, clips are filed as `Clippings/YYYYMMDD/<clip title>` using Trilium ETAPI. The destination path and date-folder format are configurable in Settings, and the popup can override the custom path for an individual clip. Choose **Trilium clipper inbox** to let Trilium file clips under the note marked `#clipperInbox`, falling back to the current Day Note.

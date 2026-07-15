@@ -63,11 +63,11 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
           title: message.clip?.title || tab?.title || "Quick note",
           pageUrl: message.clip?.pageUrl || tab?.url || ""
         };
-        sendResponse(await saveClip(clip, { destinationPath: message.destinationPath }));
+        sendResponse(await saveClip(clip, { destinationPath: message.destinationPath, tags: message.tags }));
       } else if (message.type === "save-tab") {
         const [tab] = await api.tabs.query({ active: true, currentWindow: true });
         if (!tab?.id) throw new Error("No active browser tab is available.");
-        sendResponse(await saveClip(await collectFromTab(tab.id, message.mode), { destinationPath: message.destinationPath }));
+        sendResponse(await saveClip(await collectFromTab(tab.id, message.mode), { destinationPath: message.destinationPath, tags: message.tags }));
       } else {
         sendResponse({ ok: false, error: "Unknown request." });
       }
@@ -79,6 +79,7 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function collectFromTab(tabId, mode) {
+  if (mode === "page") await api.scripting.executeScript({ target: { tabId }, files: ["vendor/defuddle.js"] });
   const [{ result }] = await api.scripting.executeScript({ target: { tabId }, func: extractClip, args: [mode] });
   return result;
 }
@@ -110,6 +111,24 @@ function extractClip(mode) {
   }
   if (mode === "selection") throw new Error("Select some text first, then clip it.");
 
+  try {
+    const result = new globalThis.Defuddle(document, { url: location.href }).parse();
+    const container = document.createElement("div");
+    container.innerHTML = result?.content || "";
+    absolutise(container);
+    if (container.textContent.trim()) {
+      const contentTitle = container.querySelector("h1, h2")?.textContent?.trim();
+      return {
+        clipType: "page",
+        title: contentTitle || result?.title?.trim() || document.title,
+        content: container.innerHTML,
+        pageUrl: location.href
+      };
+    }
+  } catch (error) {
+    console.warn("Defuddle extraction failed; using the basic page extractor.", error);
+  }
+
   const copy = document.cloneNode(true);
   copy.querySelectorAll("script, style, noscript, iframe, svg, canvas").forEach(node => node.remove());
   const candidate = copy.querySelector("article, main, [role='main']") || copy.body;
@@ -119,6 +138,7 @@ function extractClip(mode) {
 
 async function saveClip(clip, overrides = {}) {
   const settings = await loadSettings(api.storage.local);
+  const tags = normaliseTags(overrides.tags);
   if (settings.destinationMode !== "inbox" && overrides.destinationPath?.trim()) {
     settings.destinationPath = overrides.destinationPath;
   }
@@ -126,12 +146,12 @@ async function saveClip(clip, overrides = {}) {
   if (!settings.token.trim()) throw new Error("Add an ETAPI token in the extension settings first.");
   if (!clip?.content?.trim() && !clip?.pageUrl) throw new Error("There is nothing to save.");
   if (settings.destinationMode !== "inbox") {
-    return saveCustomClip(settings, clip);
+    return saveCustomClip(settings, clip, tags);
   }
-  return saveWithTriliumClipper(serverUrl, settings.token.trim(), clip);
+  return saveWithTriliumClipper(serverUrl, settings.token.trim(), clip, tags);
 }
 
-async function saveWithTriliumClipper(serverUrl, token, clip) {
+async function saveWithTriliumClipper(serverUrl, token, clip, tags) {
   const response = await fetch(`${serverUrl}/api/clipper/notes`, {
     method: "POST",
     headers: {
@@ -143,10 +163,11 @@ async function saveWithTriliumClipper(serverUrl, token, clip) {
   });
   if (!response.ok) throw new Error(await response.text() || `Trilium returned HTTP ${response.status}.`);
   const body = await response.json();
+  await addTags(serverUrl, token, body.noteId, tags);
   return { ok: true, noteId: body.noteId, location: "the Trilium clipper inbox" };
 }
 
-async function saveCustomClip(settings, clip) {
+async function saveCustomClip(settings, clip, tags) {
   const serverUrl = normaliseServerUrl(settings.serverUrl);
   const token = settings.token.trim();
   const path = normaliseDestination(settings.destinationPath);
@@ -173,7 +194,35 @@ async function saveCustomClip(settings, clip) {
       content
     })
   });
+  await addTags(serverUrl, token, response.note?.noteId, tags);
   return { ok: true, noteId: response.note?.noteId, parentNoteId, location: destination.join("/") };
+}
+
+function normaliseTags(value) {
+  const values = Array.isArray(value) ? value : String(value || "").split(/[\s,]+/);
+  const tags = [];
+  for (const value of values) {
+    const tag = String(value).trim().replace(/^#+/, "");
+    if (!tag) continue;
+    if (/\s|#/.test(tag)) throw new Error("Tags must be comma-separated and cannot contain spaces.");
+    if (!tags.includes(tag)) tags.push(tag);
+  }
+  return tags;
+}
+
+async function addTags(serverUrl, token, noteId, tags) {
+  if (!tags.length) return;
+  if (!noteId) throw new Error("Trilium did not return the clipped note ID, so its tags could not be saved.");
+  await Promise.all(tags.map((tag, position) => etapiRequest(serverUrl, token, "attributes", {
+    method: "POST",
+    body: JSON.stringify({
+      attributeId: crypto.randomUUID().replaceAll("-", ""),
+      noteId,
+      type: "label",
+      name: tag,
+      position
+    })
+  })));
 }
 
 function normaliseDestination(value) {

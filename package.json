@@ -1,0 +1,10 @@
+{
+  "name": "trilium-web-clipper-unofficial",
+  "private": true,
+  "scripts": {
+    "vendor": "node scripts/vendor-defuddle.mjs"
+  },
+  "dependencies": {
+    "defuddle": "0.19.1"
+  }
+}

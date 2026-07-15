@@ -14,6 +14,7 @@ const moreMenu = document.querySelector("#more-menu");
 const saveMenu = document.querySelector("#save-menu");
 const quickNotePanel = document.querySelector("#quick-note-panel");
 const destinationInput = document.querySelector("#destination-label");
+const tagsInput = document.querySelector("#property-tags");
 const interactiveButtons = document.querySelectorAll("button");
 
 let activeMode = "page";
@@ -27,7 +28,6 @@ destinationInput.readOnly = settings.destinationMode === "inbox";
 destinationInput.title = settings.destinationMode === "inbox"
   ? "Trilium chooses the note marked #clipperInbox, or today's Day Note."
   : "Override the configured destination for this clip.";
-document.querySelector("#property-destination").textContent = destination;
 document.querySelector("#property-created").textContent = localDate();
 
 bindEvents();
@@ -50,9 +50,6 @@ function bindEvents() {
   });
   document.querySelector("#close-quick-note").addEventListener("click", () => { quickNotePanel.hidden = true; });
   document.querySelector("#save-note").addEventListener("click", saveQuickNote);
-  destinationInput.addEventListener("input", () => {
-    document.querySelector("#property-destination").textContent = destinationInput.value.trim() || "—";
-  });
   propertiesToggle.addEventListener("click", () => {
     const expanded = propertiesToggle.getAttribute("aria-expanded") === "true";
     propertiesToggle.setAttribute("aria-expanded", String(!expanded));
@@ -117,7 +114,7 @@ async function saveTab(mode) {
   if (settings.destinationMode !== "inbox" && !destinationInput.value.trim()) {
     return setStatus("Enter a clip destination first.", "error");
   }
-  await send({ type: "save-tab", mode, destinationPath: destinationOverride() });
+  await send({ type: "save-tab", mode, destinationPath: destinationOverride(), tags: tagsInput.value });
 }
 
 async function saveQuickNote() {
@@ -129,6 +126,7 @@ async function saveQuickNote() {
   await send({
     type: "save-quick-note",
     destinationPath: destinationOverride(),
+    tags: tagsInput.value,
     clip: {
       title: document.querySelector("#quick-note-title").value.trim(),
       content: `<p>${escapeHtml(content).replace(/\n/g, "</p><p>")}</p>`,
