@@ -76,7 +76,7 @@ async function loadPreview() {
     selection = response?.selection || "";
     const preview = await api.runtime.sendMessage({ type: "get-page-preview" });
     if (!preview?.ok) throw new Error(preview?.error || "The page preview is unavailable.");
-    pagePreview = htmlToPreviewText(preview.content);
+    pagePreview = htmlToMarkdown(preview.content);
     const parsedTitle = preview.title?.trim();
     if (parsedTitle) {
       titleInput.value = parsedTitle;
@@ -90,13 +90,59 @@ async function loadPreview() {
   }
 }
 
-function htmlToPreviewText(html) {
+function htmlToMarkdown(html) {
   const container = document.createElement("div");
   container.innerHTML = html || "";
-  return (container.innerText || container.textContent || "")
+  const markdown = nodeToMarkdown(container)
+    .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
-    .trim()
-    .slice(0, 12000) || "This page has no text preview.";
+    .trim();
+  return markdown.slice(0, 12000) || "This page has no text preview.";
+}
+
+// A lightweight preview-only converter. Notes are still saved as Trilium
+// rich-text HTML; this just renders Markdown for the popup preview panel.
+function nodeToMarkdown(root) {
+  let out = "";
+  for (const node of root.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out += node.textContent.replace(/\s+/g, " ");
+      continue;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+    const tag = node.tagName.toLowerCase();
+    const inner = nodeToMarkdown(node);
+    if (/^h[1-6]$/.test(tag)) {
+      out += `\n\n${"#".repeat(Number(tag[1]))} ${inner.trim()}\n\n`;
+    } else if (tag === "strong" || tag === "b") {
+      out += `**${inner}**`;
+    } else if (tag === "em" || tag === "i") {
+      out += `*${inner}*`;
+    } else if (tag === "code" && node.closest("pre") === null) {
+      out += `\`${inner}\``;
+    } else if (tag === "pre") {
+      out += `\n\n\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
+    } else if (tag === "a") {
+      const href = node.getAttribute("href");
+      out += href ? `[${inner}](${href})` : inner;
+    } else if (tag === "img") {
+      const src = node.getAttribute("src");
+      out += src ? `![${node.getAttribute("alt") || ""}](${src})` : "";
+    } else if (tag === "blockquote") {
+      out += `\n\n> ${inner.trim().replace(/\n+/g, "\n> ")}\n\n`;
+    } else if (tag === "li") {
+      out += `\n- ${inner.trim()}`;
+    } else if (tag === "hr") {
+      out += "\n\n---\n\n";
+    } else if (tag === "br") {
+      out += "\n";
+    } else if (["p", "div", "section", "article", "ul", "ol", "table", "tr"].includes(tag)) {
+      out += `\n\n${inner}\n\n`;
+    } else {
+      out += inner;
+    }
+  }
+  return out;
 }
 
 function setMode(mode) {

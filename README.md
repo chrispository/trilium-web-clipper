@@ -1,6 +1,8 @@
 # Trilium Web Clipper - Unofficial
 
-A small, web clipping browser extension optimized for self-hosted Trilium Notes instances. The layout was cloned from the popular Obsidian Web Clipper, and also uses Defuddle just like Obsidian Web Clipper. For Chromium based browsers. Markdown for
+A small, web clipping browser extension optimized for self-hosted Trilium Notes instances. Layout cloned from the popular Obsidian Web Clipper, and also uses Defuddle for markdown generation just like Obsidian Web Clipper. For Chromium based browsers.
+
+![Trilium Web Clipper popout](.gitassets/clipper-popup.png)
 
 ## Install
 

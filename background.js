@@ -187,8 +187,9 @@ async function saveCustomClip(settings, clip, tags) {
     parentNoteId = dateNote.noteId;
     destination.push(date);
   }
+  const heading = `<h1>${escapeHtml(clip.title || "Clipped note")}</h1>`;
   const source = clip.pageUrl ? `<p><a href="${escapeAttribute(clip.pageUrl)}">Source: ${escapeHtml(clip.pageUrl)}</a></p>` : "";
-  const content = `${source}${clip.content || ""}`;
+  const content = `${heading}${source}${clip.content || ""}`;
   const response = await etapiRequest(serverUrl, token, "create-note", {
     method: "POST",
     body: JSON.stringify({
