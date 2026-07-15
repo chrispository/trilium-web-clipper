@@ -1,4 +1,4 @@
-# Homelab Trilium Clipper
+# Trilium Web Clipper - Unofficial
 
 A small, dependency-free Manifest V3 browser extension for self-hosted Trilium Notes. It deliberately connects only to the address you configure—there is no localhost port scan.
 
