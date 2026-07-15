@@ -20,4 +20,4 @@ The server address and token are stored locally in the browser's extension stora
 - Selection, page, link, and quick-text clips.
 - Keyboard shortcut: `Ctrl+Shift+Y` / `Command+Shift+Y`.
 - Page clips retain basic HTML and convert relative links/images to absolute URLs. When using the built-in clipper inbox mode, Trilium also handles its normal image processing.
-- By default, clips are filed as `Clippings/YYYYMMDD/<clip title>` using Trilium ETAPI. The destination path is configurable in Settings, for example `ideaverse/Clippings`. Disable **Save clips under Clippings/YYYYMMDD** to use Trilium’s built-in clipper inbox behavior instead.
+- By default, clips are filed as `Clippings/YYYYMMDD/<clip title>` using Trilium ETAPI. The destination path and date-folder format are configurable in Settings, and the popup can override the custom path for an individual clip. Choose **Trilium clipper inbox** to let Trilium file clips under the note marked `#clipperInbox`, falling back to the current Day Note.

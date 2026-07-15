@@ -1,29 +1,98 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"><title>Trilium Clipper</title></head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>Trilium Clipper</title>
+  </head>
   <body class="popup">
-    <main class="popup-shell">
-      <header>
-        <span class="mark"><img src="icons/trilium-128.png" alt=""></span>
-        <div class="brand"><h1>Trilium Clipper</h1><p id="server-label">Checking settings…</p></div>
-        <button id="settings" class="icon-button" title="Settings" aria-label="Settings">⚙</button>
+    <main class="clipper-shell">
+      <header class="clipper-toolbar">
+        <button class="template-button" type="button" aria-label="Clip template">
+          <span>Default</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 9 4-4 4 4M16 15l-4 4-4-4"/></svg>
+        </button>
+        <nav class="toolbar-actions" aria-label="Clipper actions">
+          <button id="more" class="toolbar-button" type="button" title="More actions" aria-label="More actions" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+          </button>
+          <button id="settings" class="toolbar-button" type="button" title="Settings" aria-label="Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+          </button>
+        </nav>
+        <div id="more-menu" class="popup-menu toolbar-menu" role="menu" hidden>
+          <button id="open-quick-note" type="button" role="menuitem">New quick note…</button>
+          <button id="open-settings-menu" type="button" role="menuitem">Clipper settings…</button>
+        </div>
       </header>
-      <section id="selection-preview" class="selection-preview" hidden aria-label="Selected text">
-        <div class="preview-header"><span>Selection</span><span id="selection-count"></span></div>
-        <div id="selection-text" class="selection-text"></div>
+
+      <input id="note-title" class="clip-title" aria-label="Note title" value="Loading page…" readonly>
+
+      <button id="properties-toggle" class="properties-toggle" type="button" aria-expanded="true">
+        <span>Properties</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg>
+      </button>
+
+      <section id="properties" class="properties" aria-label="Trilium note properties">
+        <div class="property-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg>
+          <span class="property-name">title</span>
+          <span id="property-title" class="property-value">Loading page…</span>
+        </div>
+        <div class="property-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
+          <span class="property-name">source</span>
+          <span id="property-source" class="property-value property-url">—</span>
+        </div>
+        <div class="property-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg>
+          <span class="property-name">note type</span>
+          <span class="property-value">text</span>
+        </div>
+        <div class="property-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+          <span class="property-name">created</span>
+          <span id="property-created" class="property-value">—</span>
+        </div>
+        <div class="property-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h6l2 2h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2"/></svg>
+          <span class="property-name">destination</span>
+          <span id="property-destination" class="property-value">Clippings</span>
+        </div>
       </section>
-      <div class="actions">
-        <button id="clip-selection" class="primary">Save selection</button>
-        <button id="clip-page">Save page</button>
+
+      <div id="content-preview" class="content-preview" tabindex="0" aria-label="Clip preview">Loading preview…</div>
+
+      <div class="clip-footer">
+        <input id="destination-label" class="destination-label" type="text" aria-label="Clip destination" value="Clippings" autocomplete="off">
+        <div class="save-actions">
+          <button id="clip-primary" class="clip-primary" type="button">Add to Trilium</button>
+          <button id="save-menu-toggle" class="save-menu-toggle" type="button" aria-label="Choose clip type" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg>
+          </button>
+          <div id="save-menu" class="popup-menu save-menu" role="menu" hidden>
+            <button id="clip-selection" type="button" role="menuitem">Add selection to Trilium</button>
+            <button id="clip-page" type="button" role="menuitem">Add full page to Trilium</button>
+          </div>
+        </div>
       </div>
-      <details>
-        <summary>Quick note</summary>
-        <input id="note-title" aria-label="Note title" placeholder="Title (optional)">
-        <textarea id="note-content" aria-label="Note content" placeholder="Write a note about this page…"></textarea>
-        <button id="save-note" class="primary">Save note</button>
-      </details>
-      <p id="status" class="status" aria-live="polite" hidden><span class="status-icon">•</span><span id="status-message"></span></p>
-      <p class="hint">Right-click text, a page, or a link to save it. <kbd>Ctrl/⌘ Shift Y</kbd> saves a selection.</p>
+
+      <p id="status" class="clip-status" aria-live="polite" hidden>
+        <span class="status-icon">•</span><span id="status-message"></span>
+      </p>
+
+      <section id="quick-note-panel" class="quick-note-panel" hidden aria-label="Quick note">
+        <div class="quick-note-header">
+          <h2>Quick note</h2>
+          <button id="close-quick-note" class="toolbar-button" type="button" aria-label="Close quick note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <input id="quick-note-title" aria-label="Quick note title" placeholder="Title (optional)">
+        <textarea id="note-content" aria-label="Quick note content" placeholder="Write a note about this page…"></textarea>
+        <button id="save-note" class="quick-note-save" type="button">Add to Trilium</button>
+      </section>
     </main>
     <script type="module" src="popup.js"></script>
   </body>

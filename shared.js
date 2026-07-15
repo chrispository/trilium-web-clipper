@@ -1,9 +1,37 @@
 export const DEFAULT_SETTINGS = {
   serverUrl: "",
   token: "",
+  destinationMode: "custom",
   organizeByDate: true,
-  destinationPath: "Clippings"
+  destinationPath: "Clippings",
+  dateFormat: "YYYYMMDD"
 };
+
+export const DATE_FORMATS = ["YYYYMMDD", "YYYY-MM-DD", "DD-MM-YYYY", "DD.MM.YYYY", "MM-DD-YYYY"];
+
+export async function loadSettings(storageArea) {
+  const stored = await storageArea.get(null);
+  return {
+    ...DEFAULT_SETTINGS,
+    ...stored,
+    // Before destinationMode existed, organizeByDate=false meant clipper inbox.
+    destinationMode: stored.destinationMode ?? (stored.organizeByDate === false ? "inbox" : "custom")
+  };
+}
+
+export function formatDateFolder(date = new Date(), format = DEFAULT_SETTINGS.dateFormat) {
+  const year = String(date.getFullYear());
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const values = {
+    YYYYMMDD: `${year}${month}${day}`,
+    "YYYY-MM-DD": `${year}-${month}-${day}`,
+    "DD-MM-YYYY": `${day}-${month}-${year}`,
+    "DD.MM.YYYY": `${day}.${month}.${year}`,
+    "MM-DD-YYYY": `${month}-${day}-${year}`
+  };
+  return values[format] || values[DEFAULT_SETTINGS.dateFormat];
+}
 
 export function browserApi() {
   return globalThis.browser ?? globalThis.chrome;

@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, browserApi, localNowDateTime, normaliseServerUrl } from "./shared.js";
+import { browserApi, formatDateFolder, loadSettings, localNowDateTime, normaliseServerUrl } from "./shared.js";
 
 const api = browserApi();
 
@@ -63,11 +63,11 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
           title: message.clip?.title || tab?.title || "Quick note",
           pageUrl: message.clip?.pageUrl || tab?.url || ""
         };
-        sendResponse(await saveClip(clip));
+        sendResponse(await saveClip(clip, { destinationPath: message.destinationPath }));
       } else if (message.type === "save-tab") {
         const [tab] = await api.tabs.query({ active: true, currentWindow: true });
         if (!tab?.id) throw new Error("No active browser tab is available.");
-        sendResponse(await saveClip(await collectFromTab(tab.id, message.mode)));
+        sendResponse(await saveClip(await collectFromTab(tab.id, message.mode), { destinationPath: message.destinationPath }));
       } else {
         sendResponse({ ok: false, error: "Unknown request." });
       }
@@ -117,13 +117,16 @@ function extractClip(mode) {
   return { clipType: "page", title: document.title, content: candidate.innerHTML, pageUrl: location.href };
 }
 
-async function saveClip(clip) {
-  const settings = { ...DEFAULT_SETTINGS, ...(await api.storage.local.get(DEFAULT_SETTINGS)) };
+async function saveClip(clip, overrides = {}) {
+  const settings = await loadSettings(api.storage.local);
+  if (settings.destinationMode !== "inbox" && overrides.destinationPath?.trim()) {
+    settings.destinationPath = overrides.destinationPath;
+  }
   const serverUrl = normaliseServerUrl(settings.serverUrl);
   if (!settings.token.trim()) throw new Error("Add an ETAPI token in the extension settings first.");
   if (!clip?.content?.trim() && !clip?.pageUrl) throw new Error("There is nothing to save.");
-  if (settings.organizeByDate !== false) {
-    return saveDatedClip(settings, clip);
+  if (settings.destinationMode !== "inbox") {
+    return saveCustomClip(settings, clip);
   }
   return saveWithTriliumClipper(serverUrl, settings.token.trim(), clip);
 }
@@ -132,7 +135,7 @@ async function saveWithTriliumClipper(serverUrl, token, clip) {
   const response = await fetch(`${serverUrl}/api/clipper/notes`, {
     method: "POST",
     headers: {
-      Authorization: settings.token.trim(),
+      Authorization: token,
       "Content-Type": "application/json",
       "trilium-local-now-datetime": localNowDateTime()
     },
@@ -143,7 +146,7 @@ async function saveWithTriliumClipper(serverUrl, token, clip) {
   return { ok: true, noteId: body.noteId, location: "the Trilium clipper inbox" };
 }
 
-async function saveDatedClip(settings, clip) {
+async function saveCustomClip(settings, clip) {
   const serverUrl = normaliseServerUrl(settings.serverUrl);
   const token = settings.token.trim();
   const path = normaliseDestination(settings.destinationPath);
@@ -152,20 +155,25 @@ async function saveDatedClip(settings, clip) {
     const folder = await findOrCreateNote(serverUrl, token, segment, parentNoteId, "book");
     parentNoteId = folder.noteId;
   }
-  const date = localDateKey();
-  const dateNote = await findOrCreateNote(serverUrl, token, date, parentNoteId, "book");
+  const destination = [...path];
+  if (settings.organizeByDate !== false) {
+    const date = formatDateFolder(new Date(), settings.dateFormat);
+    const dateNote = await findOrCreateNote(serverUrl, token, date, parentNoteId, "book");
+    parentNoteId = dateNote.noteId;
+    destination.push(date);
+  }
   const source = clip.pageUrl ? `<p><a href="${escapeAttribute(clip.pageUrl)}">Source: ${escapeHtml(clip.pageUrl)}</a></p>` : "";
   const content = `${source}${clip.content || ""}`;
   const response = await etapiRequest(serverUrl, token, "create-note", {
     method: "POST",
     body: JSON.stringify({
-      parentNoteId: dateNote.noteId,
+      parentNoteId,
       title: clip.title || "Clipped note",
       type: "text",
       content
     })
   });
-  return { ok: true, noteId: response.note?.noteId, parentNoteId: dateNote.noteId, location: `${path.join("/")}/${date}` };
+  return { ok: true, noteId: response.note?.noteId, parentNoteId, location: destination.join("/") };
 }
 
 function normaliseDestination(value) {
@@ -212,11 +220,6 @@ async function etapiRequest(serverUrl, token, path, options = {}) {
   return response.status === 204 ? {} : response.json();
 }
 
-function localDateKey() {
-  const date = new Date();
-  return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
-}
-
 function escapeHtml(value) {
   return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
@@ -227,7 +230,7 @@ function escapeAttribute(value) {
 }
 
 async function testConnection() {
-  const settings = { ...DEFAULT_SETTINGS, ...(await api.storage.local.get(DEFAULT_SETTINGS)) };
+  const settings = await loadSettings(api.storage.local);
   const serverUrl = normaliseServerUrl(settings.serverUrl);
   if (!settings.token.trim()) throw new Error("An ETAPI token is required for server installations.");
   const response = await fetch(`${serverUrl}/api/clipper/handshake`, { headers: { Authorization: settings.token.trim() } });

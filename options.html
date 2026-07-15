@@ -1,19 +1,76 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"><title>Trilium Clipper settings</title></head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>Trilium Clipper settings</title>
+  </head>
   <body class="options">
     <main>
-      <header><span class="mark">T</span><div><h1>Trilium Clipper</h1><p>Connect directly to your self-hosted Trilium server.</p></div></header>
+      <header>
+        <span class="mark">T</span>
+        <div><h1>Trilium Clipper</h1><p>Connect directly to your self-hosted Trilium server.</p></div>
+      </header>
+
       <form id="settings-form">
-        <label>Trilium server address<input id="server-url" type="url" required placeholder="https://trilium.example.com"></label>
-        <label>ETAPI token<input id="token" type="password" required autocomplete="off" placeholder="Paste an ETAPI token"></label>
-        <label>Clip destination<input id="destination-path" type="text" required placeholder="Clippings" autocomplete="off"></label>
-        <p class="explanation">Use a slash-separated note path. For example, <code>Clippings</code> creates a top-level folder, while <code>ideaverse/Clippings</code> creates or reuses that nested path. The date folder is added automatically.</p>
-        <label class="checkbox-label"><input id="organize-by-date" type="checkbox"> Save clips under <code>Clippings/YYYYMMDD</code></label>
-        <p class="explanation">When enabled, the extension creates the destination path and a date book such as <code>20260714</code> automatically. Turn this off to use Trilium’s normal clipper inbox behavior.</p>
-        <p class="explanation">In Trilium, open <em>Options → ETAPI</em>, create a token, then paste it here. The token stays in this browser’s local extension storage and is sent only to this configured server.</p>
-        <div class="form-actions"><button type="submit" class="primary">Save settings</button><button id="test" type="button">Test connection</button></div>
-        <p id="status" class="status" aria-live="polite"></p>
+        <div class="field-group">
+          <label for="server-url">Trilium server address</label>
+          <input id="server-url" type="url" required placeholder="http://home:8085">
+          <p class="field-hint">Include the port when required, for example <code>http://home:8085</code>.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="token">ETAPI token</label>
+          <input id="token" type="password" required autocomplete="off" placeholder="Paste an ETAPI token">
+          <p class="field-hint">Create a token in Trilium under <em>Options → ETAPI</em>. It stays in this browser’s local extension storage.</p>
+        </div>
+
+        <fieldset class="destination-settings">
+          <legend>Clip destination</legend>
+          <label class="destination-option">
+            <input id="destination-custom" type="radio" name="destination-mode" value="custom">
+            <span><strong>Custom note path</strong><small>File clips under a path you choose.</small></span>
+          </label>
+
+          <div id="custom-destination-settings" class="custom-destination-settings">
+            <div class="field-group compact-field">
+              <label for="destination-path">Note path</label>
+              <input id="destination-path" type="text" required placeholder="Clippings" autocomplete="off">
+              <p class="field-hint">Use slashes for nested notes, such as <code>ideaverse/Clippings</code>.</p>
+            </div>
+
+            <div class="date-settings">
+              <label class="checkbox-label"><input id="organize-by-date" type="checkbox"><span>Add a dated subfolder</span></label>
+              <label id="date-format-field" class="date-format-field" for="date-format">
+                <span>Date format</span>
+                <select id="date-format">
+                  <option value="YYYYMMDD">YYYYMMDD — 20260714</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD — 2026-07-14</option>
+                  <option value="DD-MM-YYYY">DD-MM-YYYY — 14-07-2026</option>
+                  <option value="DD.MM.YYYY">DD.MM.YYYY — 14.07.2026</option>
+                  <option value="MM-DD-YYYY">MM-DD-YYYY — 07-14-2026</option>
+                </select>
+              </label>
+              <p id="destination-example" class="destination-example"></p>
+            </div>
+          </div>
+
+          <label class="destination-option">
+            <input id="destination-inbox" type="radio" name="destination-mode" value="inbox">
+            <span><strong>Trilium clipper inbox</strong><small>Let Trilium use the note marked <code>#clipperInbox</code>, or today’s Day Note.</small></span>
+          </label>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" class="primary">Save settings</button>
+          <button id="test" type="button">Test connection</button>
+        </div>
+
+        <div id="status" class="connection-status" aria-live="polite" hidden>
+          <span class="connection-status-icon" aria-hidden="true">•</span>
+          <span id="status-message"></span>
+        </div>
       </form>
     </main>
     <script type="module" src="options.js"></script>
