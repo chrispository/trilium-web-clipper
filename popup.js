@@ -4,6 +4,9 @@ const api = browserApi();
 const status = document.querySelector("#status");
 const statusMessage = document.querySelector("#status-message");
 const statusIcon = document.querySelector(".status-icon");
+const selectionPreview = document.querySelector("#selection-preview");
+const selectionText = document.querySelector("#selection-text");
+const selectionCount = document.querySelector("#selection-count");
 const serverLabel = document.querySelector("#server-label");
 const buttons = document.querySelectorAll("button");
 
@@ -42,8 +45,9 @@ async function showSelectionState() {
   try {
     const response = await api.runtime.sendMessage({ type: "get-selection" });
     if (!response?.selection) return;
-    const preview = response.selection.replace(/\s+/g, " ").slice(0, 94);
-    setStatus(`Selection ready · “${preview}${response.selection.length > 94 ? "…" : ""}”`, "selection");
+    selectionText.textContent = response.selection;
+    selectionCount.textContent = `${response.selection.length.toLocaleString()} characters`;
+    selectionPreview.hidden = false;
   } catch { /* Some browser pages do not allow script access. */ }
 }
 function escapeHtml(value) { const element = document.createElement("div"); element.textContent = value; return element.innerHTML; }

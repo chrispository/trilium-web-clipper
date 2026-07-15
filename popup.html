@@ -8,7 +8,10 @@
         <div class="brand"><h1>Trilium Clipper</h1><p id="server-label">Checking settings…</p></div>
         <button id="settings" class="icon-button" title="Settings" aria-label="Settings">⚙</button>
       </header>
-      <p id="status" class="status" aria-live="polite" hidden><span class="status-icon">•</span><span id="status-message"></span></p>
+      <section id="selection-preview" class="selection-preview" hidden aria-label="Selected text">
+        <div class="preview-header"><span>Selection</span><span id="selection-count"></span></div>
+        <div id="selection-text" class="selection-text"></div>
+      </section>
       <div class="actions">
         <button id="clip-selection" class="primary">Save selection</button>
         <button id="clip-page">Save page</button>
@@ -19,6 +22,7 @@
         <textarea id="note-content" aria-label="Note content" placeholder="Write a note about this page…"></textarea>
         <button id="save-note" class="primary">Save note</button>
       </details>
+      <p id="status" class="status" aria-live="polite" hidden><span class="status-icon">•</span><span id="status-message"></span></p>
       <p class="hint">Right-click text, a page, or a link to save it. <kbd>Ctrl/⌘ Shift Y</kbd> saves a selection.</p>
     </main>
     <script type="module" src="popup.js"></script>
