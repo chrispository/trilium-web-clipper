@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
-    <title>Trilium Clipper settings</title>
+    <title>Trilium Web Clipper - Unofficial settings</title>
   </head>
   <body class="options">
     <main>
       <header>
-        <span class="mark">T</span>
-        <div><h1>Trilium Clipper</h1><p>Connect directly to your self-hosted Trilium server.</p></div>
+        <span class="mark"><img src="icons/trilium-48.png" alt="Trilium"></span>
+        <div><h1>Trilium Web Clipper - Unofficial</h1><p>Connect directly to your self-hosted Trilium server.</p></div>
       </header>
 
       <form id="settings-form">
@@ -37,13 +37,12 @@
             <div class="field-group compact-field">
               <label for="destination-path">Note path</label>
               <input id="destination-path" type="text" required placeholder="Clippings" autocomplete="off">
-              <p class="field-hint">Use slashes for nested notes, such as <code>ideaverse/Clippings</code>.</p>
+              <p class="field-hint">Use slashes for nested notes, such as <code>Ideaverse/Clippings</code>.</p>
             </div>
 
             <div class="date-settings">
-              <label class="checkbox-label"><input id="organize-by-date" type="checkbox"><span>Add a dated subfolder</span></label>
+              <label class="checkbox-label"><input id="organize-by-date" type="checkbox"><span>Dated Subfolder</span></label>
               <label id="date-format-field" class="date-format-field" for="date-format">
-                <span>Date format</span>
                 <select id="date-format">
                   <option value="YYYYMMDD">YYYYMMDD — 20260714</option>
                   <option value="YYYY-MM-DD">YYYY-MM-DD — 2026-07-14</option>

@@ -1,12 +1,12 @@
 # Trilium Web Clipper - Unofficial
 
-A small, dependency-free Manifest V3 browser extension for self-hosted Trilium Notes. It deliberately connects only to the address you configure—there is no localhost port scan.
+A small, dependency-free, web clipping browser extension optimized for self-hosted Trilium Notes. The layout was cloned from the popular Obsidian Web Clipper. For Chromium based browsers.
 
-## Install (Chromium)
+## Install
 
-1. In Trilium, create an ETAPI token: **Options → ETAPI**.
-2. Visit `chrome://extensions`, enable **Developer mode**, select **Load unpacked**, and choose this directory.
-3. Open the extension’s **Settings**, enter your Trilium server address, paste the token, and select **Test connection**.
+1. In your Trilium instance, create an ETAPI token: **Options → ETAPI**.
+2. Visit `chrome://extensions`, enable **Developer mode**, select **Load unpacked**, and choose the cloned directory.
+3. Open the extension’s (right-click)  **Options**, enter your Trilium server address (including port if necessary), paste the token, and select **Test connection**.
 4. Clip a selection or page from the toolbar popup, or use the page’s right-click menu.
 
 Trilium stores the result beneath the note marked with the `clipperInbox` label; if none exists, it uses today’s day note. Multiple clips of the same URL and type append to the same note, matching Trilium’s server-side clipper behavior.
