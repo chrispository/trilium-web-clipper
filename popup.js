@@ -74,7 +74,14 @@ async function loadPreview() {
     if (!tab?.id) throw new Error("No active browser tab is available.");
     const response = await api.runtime.sendMessage({ type: "get-selection" });
     selection = response?.selection || "";
-    pagePreview = await collectPagePreview(tab.id);
+    const preview = await api.runtime.sendMessage({ type: "get-page-preview" });
+    if (!preview?.ok) throw new Error(preview?.error || "The page preview is unavailable.");
+    pagePreview = htmlToPreviewText(preview.content);
+    const parsedTitle = preview.title?.trim();
+    if (parsedTitle) {
+      titleInput.value = parsedTitle;
+      propertyTitle.textContent = parsedTitle;
+    }
     setMode(selection ? "selection" : "page");
   } catch (error) {
     pagePreview = "Preview is unavailable on this page.";
@@ -83,15 +90,13 @@ async function loadPreview() {
   }
 }
 
-async function collectPagePreview(tabId) {
-  const [{ result }] = await api.scripting.executeScript({
-    target: { tabId },
-    func: () => {
-      const root = document.querySelector("article, main, [role='main']") || document.body;
-      return (root?.innerText || "").replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
-    }
-  });
-  return result || "This page has no text preview.";
+function htmlToPreviewText(html) {
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+  return (container.innerText || container.textContent || "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 12000) || "This page has no text preview.";
 }
 
 function setMode(mode) {

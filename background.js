@@ -55,6 +55,11 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
           func: () => window.getSelection()?.toString().trim() || ""
         });
         sendResponse({ ok: true, selection: result || "" });
+      } else if (message.type === "get-page-preview") {
+        const [tab] = await api.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.id) throw new Error("No active browser tab is available.");
+        const clip = await collectFromTab(tab.id, "page");
+        sendResponse({ ok: true, title: clip?.title || tab.title || "Untitled", content: clip?.content || "" });
       } else if (message.type === "save-quick-note") {
         const [tab] = await api.tabs.query({ active: true, currentWindow: true });
         const clip = {
@@ -117,10 +122,9 @@ function extractClip(mode) {
     container.innerHTML = result?.content || "";
     absolutise(container);
     if (container.textContent.trim()) {
-      const contentTitle = container.querySelector("h1, h2")?.textContent?.trim();
       return {
         clipType: "page",
-        title: contentTitle || result?.title?.trim() || document.title,
+        title: result?.title?.trim() || document.title,
         content: container.innerHTML,
         pageUrl: location.href
       };
@@ -240,7 +244,10 @@ async function findOrCreateNote(serverUrl, token, title, parentNoteId, type) {
     limit: "20"
   });
   const found = await etapiRequest(serverUrl, token, `notes?${query}`);
-  const existing = (found.results || []).find(note => note.title === title);
+  // Only reuse a note that is a *direct* child of parentNoteId. The ancestor
+  // filter alone matches any descendant (everything descends from "root"), so a
+  // pre-existing note of the same title elsewhere in the tree would be reused.
+  const existing = (found.results || []).find(note => note.title === title && (note.parentNoteIds || []).includes(parentNoteId));
   if (existing) return existing;
   const created = await etapiRequest(serverUrl, token, "create-note", {
     method: "POST",

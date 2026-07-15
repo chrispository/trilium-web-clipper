@@ -8,6 +8,7 @@ button:hover { border-color: #176b43; background: #f8fbf8; } button:active { tra
 button:disabled { cursor: wait; opacity: .6; } button.primary { color: white; background: #176b43; border-color: #176b43; box-shadow: 0 2px 4px #176b4326; } button.primary:hover { background: #115536; border-color: #115536; }
 header { display: flex; align-items: center; gap: 11px; } h1 { font-size: 16px; margin: 0; letter-spacing: -.02em; } header p { margin: 3px 0 0; color: #647166; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 245px; }
 .mark { display: grid; place-items: center; flex: 0 0 auto; width: 35px; height: 35px; border-radius: 11px; background: #176b43; overflow: hidden; box-shadow: 0 2px 5px #176b4328; }.mark img { width: 27px; height: 27px; object-fit: contain; }
+.options .mark { border-radius: 0; background: transparent; box-shadow: none; }.options .mark img { width: 35px; height: 35px; }
 .popup { width: 352px; height: 540px; padding: 0; color: #d4d4d4; background: #1e1e1e; color-scheme: dark; overflow: hidden; }
 .clipper-shell { position: relative; display: flex; flex-direction: column; height: 540px; padding: 8px 11px 9px; background: #1e1e1e; border: 1px solid #3a3a3a; overflow: hidden; }
 .clipper-shell button, .clipper-shell input, .clipper-shell textarea { color: inherit; }
@@ -19,7 +20,7 @@ header { display: flex; align-items: center; gap: 11px; } h1 { font-size: 16px; 
 .toolbar-button.is-active { color: #65ad81; background: #26382d; }
 .clipper-shell svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .clipper-shell svg circle { fill: currentColor; stroke: none; }
-.clip-title { width: 100%; min-height: 24px; padding: 0; color: #ddd; background: transparent; border: 0; border-radius: 0; outline: none; font-size: 14px; font-weight: 650; letter-spacing: 0; text-overflow: ellipsis; }
+.clip-title { flex: 1 1 auto; width: auto; min-width: 0; min-height: 24px; padding: 0; color: #ddd; background: transparent; border: 0; border-radius: 0; outline: none; font-size: 14px; font-weight: 650; letter-spacing: 0; text-overflow: ellipsis; }
 .properties-toggle { display: flex; align-items: center; gap: 3px; width: fit-content; min-height: 29px; margin: 0; padding: 0; color: #b6b6b6; background: transparent; border: 0; border-radius: 3px; box-shadow: none; font-size: 14px; font-weight: 400; }
 .properties-toggle:hover { color: #ddd; background: transparent; border-color: transparent; }
 .properties-toggle svg { width: 15px; height: 15px; transition: transform .12s ease; }
@@ -104,12 +105,12 @@ header { display: flex; align-items: center; gap: 11px; } h1 { font-size: 16px; 
 .connection-status.loading .connection-status-icon { animation: status-pulse 1s ease-in-out infinite alternate; }
 @keyframes status-pulse { to { opacity: .4; } }
 @media (prefers-color-scheme: dark) {
-  :root { color: #e4eee5; background: #172019; }
+  :root { color: #e4eee5; background: #242424; }
   button, .options main { background: #202d23; color: #e4eee5; border-color: #4a5f4d; }
   button:hover { background: #27362a; }
   header p, .field-hint { color: #b4c3b6; }
-  .options main { box-shadow: none; border-color: #3e5141; }
-  .options input[type="url"], .options input[type="password"], .options input[type="text"], .options select { color: #e4eee5; background: #1d2a20; border-color: #46604b; }
+  .options main { background: #242424; box-shadow: none; border-color: #3e5141; }
+  .options input[type="url"], .options input[type="password"], .options input[type="text"], .options select { color: #e4eee5; background: #333333; border-color: #46604b; }
   .destination-option { border-color: #3d5141; }
   .destination-option:has(input:checked) { border-color: #4d8c65; background: #21382a; }
   .destination-option small { color: #afbeb2; }
