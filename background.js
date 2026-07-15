@@ -47,8 +47,23 @@ api.runtime.onMessage.addListener((message, sender, sendResponse) => {
     try {
       if (message.type === "test-connection") {
         sendResponse(await testConnection());
+      } else if (message.type === "get-selection") {
+        const [tab] = await api.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.id) throw new Error("No active browser tab is available.");
+        const [{ result }] = await api.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => window.getSelection()?.toString().trim() || ""
+        });
+        sendResponse({ ok: true, selection: result || "" });
       } else if (message.type === "save-quick-note") {
-        sendResponse(await saveClip({ clipType: "note", ...message.clip }));
+        const [tab] = await api.tabs.query({ active: true, currentWindow: true });
+        const clip = {
+          clipType: "note",
+          ...message.clip,
+          title: message.clip?.title || tab?.title || "Quick note",
+          pageUrl: message.clip?.pageUrl || tab?.url || ""
+        };
+        sendResponse(await saveClip(clip));
       } else if (message.type === "save-tab") {
         const [tab] = await api.tabs.query({ active: true, currentWindow: true });
         if (!tab?.id) throw new Error("No active browser tab is available.");

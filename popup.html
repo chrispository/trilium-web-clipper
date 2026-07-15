@@ -2,23 +2,25 @@
 <html lang="en">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"><title>Trilium Clipper</title></head>
   <body class="popup">
-    <header>
-      <span class="mark"><img src="icons/trilium-128.png" alt=""></span>
-      <div class="brand"><h1>Trilium Clipper</h1><p id="server-label">Checking settings…</p></div>
-      <button id="settings" class="icon-button" title="Settings" aria-label="Settings">⚙</button>
-    </header>
-    <p id="status" class="status" aria-live="polite" hidden><span class="status-icon">•</span><span id="status-message"></span></p>
-    <div class="actions">
-      <button id="clip-selection" class="primary">Save selection</button>
-      <button id="clip-page">Save page</button>
-    </div>
-    <details>
-      <summary>Quick note</summary>
-      <input id="note-title" aria-label="Note title" placeholder="Title (optional)">
-      <textarea id="note-content" aria-label="Note content" placeholder="Write a note about this page…"></textarea>
-      <button id="save-note" class="primary">Save note</button>
-    </details>
-    <p class="hint">Right-click text, a page, or a link to save it. <kbd>Ctrl/⌘ Shift Y</kbd> saves a selection.</p>
+    <main class="popup-shell">
+      <header>
+        <span class="mark"><img src="icons/trilium-128.png" alt=""></span>
+        <div class="brand"><h1>Trilium Clipper</h1><p id="server-label">Checking settings…</p></div>
+        <button id="settings" class="icon-button" title="Settings" aria-label="Settings">⚙</button>
+      </header>
+      <p id="status" class="status" aria-live="polite" hidden><span class="status-icon">•</span><span id="status-message"></span></p>
+      <div class="actions">
+        <button id="clip-selection" class="primary">Save selection</button>
+        <button id="clip-page">Save page</button>
+      </div>
+      <details>
+        <summary>Quick note</summary>
+        <input id="note-title" aria-label="Note title" placeholder="Title (optional)">
+        <textarea id="note-content" aria-label="Note content" placeholder="Write a note about this page…"></textarea>
+        <button id="save-note" class="primary">Save note</button>
+      </details>
+      <p class="hint">Right-click text, a page, or a link to save it. <kbd>Ctrl/⌘ Shift Y</kbd> saves a selection.</p>
+    </main>
     <script type="module" src="popup.js"></script>
   </body>
 </html>

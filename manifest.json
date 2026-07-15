@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Trilium Web Clipper - Unofficial",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Clip selections, readable pages, and quick notes to a self-hosted Trilium Notes server.",
   "permissions": ["activeTab", "contextMenus", "scripting", "storage", "tabs"],
   "host_permissions": ["http://*/*", "https://*/*"],

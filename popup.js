@@ -10,6 +10,7 @@ const buttons = document.querySelectorAll("button");
 const settings = { ...DEFAULT_SETTINGS, ...(await api.storage.local.get(DEFAULT_SETTINGS)) };
 serverLabel.textContent = settings.serverUrl || "Set your Trilium address";
 if (!settings.token) setStatus("Add an ETAPI token in settings before clipping.", "error");
+else showSelectionState();
 
 document.querySelector("#settings").addEventListener("click", () => api.runtime.openOptionsPage());
 document.querySelector("#clip-selection").addEventListener("click", () => saveTab("selection"));
@@ -36,5 +37,13 @@ function setStatus(message, type = "") {
   statusIcon.textContent = type === "success" ? "✓" : type === "error" ? "!" : "•";
   status.className = `status ${type}`;
   status.hidden = false;
+}
+async function showSelectionState() {
+  try {
+    const response = await api.runtime.sendMessage({ type: "get-selection" });
+    if (!response?.selection) return;
+    const preview = response.selection.replace(/\s+/g, " ").slice(0, 94);
+    setStatus(`Selection ready · “${preview}${response.selection.length > 94 ? "…" : ""}”`, "selection");
+  } catch { /* Some browser pages do not allow script access. */ }
 }
 function escapeHtml(value) { const element = document.createElement("div"); element.textContent = value; return element.innerHTML; }
